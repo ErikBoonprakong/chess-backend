@@ -33,57 +33,161 @@ const corsConfig = abcCors({
 
 app
   .use(corsConfig)
-  .post("/login", postLogin)
-
+  .post("/sessions", postLogIn)
+  .post("/users", postAccount)
+  .delete("/sessions", logOut)
   .start({ port: PORT });
 
-// console.log(`Server running on http://localhost:${PORT}`);
-
-async function postLogin(server) {
+async function postLogIn(server) {
   const { username, password } = await server.body;
+  const validated = await validateLogIn(username, password);
 
-  if (!username || !password) {
-    return server.json(
-      { success: false, message: "Need to include a username and password" },
-      400
-    );
-  }
-
-  const [response] = [
-    ...(await db
-      .query("SELECT id,  password_encrypted FROM users WHERE username = ?", [
-        username,
-      ])
-      .asObjects()),
-  ];
-
-  const authenticated = await bcrypt.compare(
-    password,
-    response.password_encrypted
-  );
-
-  if (authenticated) {
-    // generate a session token and add it to the sessions table and add a cookie.
+  if (validated.result) {
     const sessionId = v4.generate();
-    await db.query(
-      "INSERT INTO sessions (uuid, user_id, logged_in, created_at, updated_at) VALUES (?, ?, TRUE, datetime('now'), datetime('now'))",
-      [sessionId, response.id]
-    );
+    await db.queryArray({
+      text: `INSERT INTO sessions (uuid, user_id, created_at) 
+                   VALUES ($1, $2, CURRENT_DATE)`,
+      args: [sessionId, validated.user[0].id],
+    });
     server.setCookie({
       name: "sessionId",
       value: sessionId,
     });
-    return server.json({ success: true }, 200);
+    server.setCookie({
+      name: "user",
+      value: username,
+    });
+    server.setCookie({
+      name: "user_id",
+      value: validated.user[0].id,
+    });
+    server.json({ message: validated.message }, 200);
   } else {
-    return server.json(
-      { success: false, message: "Username and Password are incorrect" },
-      400
-    );
+    server.json({ message: validated.message });
   }
 }
 
-console.log(
-  `My favourite colour is ${Deno.env.get(
-    "FAVE_COLOUR"
-  )} and my favourite food is ${Deno.env.get("FAVE_FOOD")}`
-);
+async function postAccount(server) {
+  const { username, password, confirmation } = await server.body;
+  const authenticated = await validateAccount(username, password, confirmation);
+  if (authenticated.result) {
+    const passwordEncrypted = await createHash(password);
+    await db.queryArray({
+      args: [username, passwordEncrypted],
+      text: `INSERT INTO users(username, encrypted_password, created_at, updated_at) 
+                   VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE);`,
+    });
+    await postLogIn(server);
+  } else {
+    server.json({ message: authenticated.message }, 400);
+  }
+}
+
+async function validateLogIn(username, password) {
+  let result = false;
+  let message = "";
+  const user = (
+    await db.queryObject({
+      args: [username],
+      text: `SELECT * FROM users WHERE username = $1`,
+    })
+  ).rows;
+  if (user[0]) {
+    const match = await bcrypt.compare(password, user[0].encrypted_password);
+    if (match) {
+      result = true;
+      message = "Success";
+    } else {
+      message = "Incorrect password.";
+    }
+  } else {
+    message = `User ${username} does not exist`;
+  }
+
+  return { result, user, message };
+}
+
+async function validateAccount(username, password, confirmation) {
+  const [userExists] = (
+    await db.queryArray({
+      text: `SELECT COUNT(*) FROM users WHERE username = $1`,
+      args: [username],
+    })
+  ).rows;
+
+  const invalidChars = [
+    "'",
+    ",",
+    ".",
+    "/",
+    ";",
+    ":",
+    "[",
+    "]",
+    "{",
+    "}",
+    '"',
+    "|",
+    "<",
+    ">",
+  ];
+
+  const exists = {
+    value: userExists[0],
+    error: `An account already exists with the e-mail ${username}. `,
+  };
+
+  const badChars = {
+    value: username.split("").some((i) => invalidChars.includes(i)),
+    error: `Invalid characters in username.`,
+  };
+
+  const match = {
+    value: password !== confirmation,
+    error: "Passwords do not match. ",
+  };
+
+  const tooShort = {
+    value: password.length < 8,
+    error: "Password must be at least 8 characters. ",
+  };
+  const authentication = { exists, match, tooShort, badChars };
+  let errorMsg = "";
+  for (const props of Object.values(authentication)) {
+    if (props.value) {
+      errorMsg += props.error;
+    }
+  }
+
+  return errorMsg
+    ? { result: false, message: errorMsg }
+    : { result: true, message: "Success" };
+}
+
+async function createHash(password) {
+  const salt = await bcrypt.genSalt(8);
+  const passwordEncrypted = await bcrypt.hash(password, salt);
+  return passwordEncrypted;
+}
+
+async function logOut(server) {
+  const { sessionId } = server.cookies;
+  await db.queryArray({
+    text: `DELETE FROM sessions WHERE uuid = $1`,
+    args: [sessionId],
+  });
+
+  await server.setCookie({
+    name: "sessionId",
+    value: "",
+  });
+
+  await server.setCookie({
+    name: "user_id",
+    value: "",
+  });
+
+  server.json({ response: "Logged out" }, 200);
+}
+
+console.log(`Server running on http://localhost:${PORT}`);
