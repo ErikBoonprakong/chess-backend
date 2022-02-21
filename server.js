@@ -12,7 +12,7 @@ config({ path: `./.env.${DENO_ENV}`, export: true });
 
 const db = new DB("./chess.db");
 
-const client = new Client(PG_URL);
+const client = new Client("PG_URL");
 await client.connect();
 
 const app = new Application();
