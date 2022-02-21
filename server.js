@@ -76,10 +76,11 @@ async function postAccount(server) {
   const { username, password, confirmation } = await server.body;
   const authenticated = await validateAccount(username, password, confirmation);
   if (authenticated.result) {
+    // server.json({ details: username, password, confirmation }, 200);
     const passwordEncrypted = await createHash(password);
     await client.queryArray({
       args: [username, passwordEncrypted],
-      text: `INSERT INTO users(username, encrypted_password, created_at, updated_at)
+      text: `INSERT INTO users(username, password_encrypted, created_at, updated_at)
                    VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE);`,
     });
     await postLogIn(server);
