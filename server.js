@@ -39,16 +39,16 @@ app
   .get("/initialise", (server) => {
     await client.queryArray(
       `CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL UNIQUE PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     password_encrypted TEXT NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL
+    created_at DATE NOT NULL,
+    updated_at DATE NOT NULL
   )`
     );
 
     await client.queryArray(`CREATE TABLE leaderboard (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL UNIQUE PRIMARY KEY,
     user_id INTEGER NOT NULL,
     games_won INTEGER NOT NULL,
     games_lost INTEGER NOT NULL, 
@@ -57,11 +57,9 @@ app
   )`);
 
     await client.queryArray(`CREATE TABLE sessions (
-    uuid TEXT PRIMARY KEY,
+    uuid TEXT PRIMARY KEY UNIQUE,
     user_id INTEGER NOT NULL,
-    logged_in INTEGER NOT NULL,
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
+    created_at DATE NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id)
   )`);
   })
