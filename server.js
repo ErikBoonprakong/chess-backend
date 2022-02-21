@@ -3,12 +3,22 @@ import { DB } from "https://deno.land/x/sqlite@v2.5.0/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
+import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
+import { config } from "https://deno.land/x/dotenv/mod.ts";
 
-const db = new DB("./schema/users.db");
+const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
+
+config({ path: `./.env.${DENO_ENV}`, export: true });
+
+const db = new DB("./chess.db");
+///
+const PG_URL = Deno.env.get("PG_URL");
+const client = new Client(PG_URL);
+await client.connect();
 
 const app = new Application();
-const PORT = 8080;
-
+const PORT = parseInt(Deno.env.get("PORT")) || 80;
+///please work
 const corsConfig = abcCors({
   origin: true,
   allowedHeaders: [
@@ -24,10 +34,10 @@ const corsConfig = abcCors({
 app
   .use(corsConfig)
   .post("/login", postLogin)
-  .post("/createaccount", postAccount)
+
   .start({ port: PORT });
 
-console.log(`Server running on http://localhost:${PORT}`);
+// console.log(`Server running on http://localhost:${PORT}`);
 
 async function postLogin(server) {
   const { username, password } = await server.body;
@@ -71,3 +81,9 @@ async function postLogin(server) {
     );
   }
 }
+
+console.log(
+  `My favourite colour is ${Deno.env.get(
+    "FAVE_COLOUR"
+  )} and my favourite food is ${Deno.env.get("FAVE_FOOD")}`
+);
