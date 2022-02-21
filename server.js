@@ -53,7 +53,7 @@ async function postLogin(server) {
   );
 
   if (authenticated) {
-    // generate a session token and add it to the sessions db and add a cookie.
+    // generate a session token and add it to the sessions table and add a cookie.
     const sessionId = v4.generate();
     await db.query(
       "INSERT INTO sessions (uuid, user_id, logged_in, created_at, updated_at) VALUES (?, ?, TRUE, datetime('now'), datetime('now'))",
