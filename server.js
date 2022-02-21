@@ -11,7 +11,7 @@ const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
 config({ path: `./.env.${DENO_ENV}`, export: true });
 
 const db = new DB("./chess.db");
-
+///
 const client = new Client("PG_URL");
 await client.connect();
 
