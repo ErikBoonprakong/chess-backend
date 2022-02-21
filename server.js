@@ -36,33 +36,6 @@ app
   .get("/random", async (server) => {
     server.json({ message: "random message" }, 200);
   })
-  .get("/initialise", (server) => {
-    await client.queryArray(
-      `CREATE TABLE users (
-    id SERIAL UNIQUE PRIMARY KEY,
-    username TEXT UNIQUE NOT NULL,
-    password_encrypted TEXT NOT NULL,
-    created_at DATE NOT NULL,
-    updated_at DATE NOT NULL
-  )`
-    );
-
-    await client.queryArray(`CREATE TABLE leaderboard (
-    id SERIAL UNIQUE PRIMARY KEY,
-    user_id INTEGER NOT NULL,
-    games_won INTEGER NOT NULL,
-    games_lost INTEGER NOT NULL, 
-    games_stalemate INTEGER NOT NULL,
-    FOREIGN KEY(user_id) REFERENCES users(id) 
-  )`);
-
-    await client.queryArray(`CREATE TABLE sessions (
-    uuid TEXT PRIMARY KEY UNIQUE,
-    user_id INTEGER NOT NULL,
-    created_at DATE NOT NULL,
-    FOREIGN KEY(user_id) REFERENCES users(id)
-  )`);
-  })
   .post("/sessions", postLogIn)
   .post("/users", postAccount)
   .delete("/sessions", logOut)
