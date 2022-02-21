@@ -22,4 +22,13 @@ try {
     games_stalemate INTEGER NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id) 
   )`);
+
+  await db.query(`CREATE TABLE sessions (
+    uuid TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    logged_in INTEGER NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+  )`);
 }
