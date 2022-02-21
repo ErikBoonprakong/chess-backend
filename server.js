@@ -36,6 +36,10 @@ app
   .get("/random", async (server) => {
     server.json({ message: "random message" }, 200);
   })
+  .get("/results", async (server) => {
+    const results = await client.queryArray({ text: `SELECT * FROM users` });
+    server.json(results);
+  })
   .post("/sessions", postLogIn)
   .post("/users", postAccount)
   .delete("/sessions", logOut)
@@ -104,7 +108,7 @@ async function validateLogIn(username, password) {
     })
   ).rows;
   if (user[0]) {
-    const match = await bcrypt.compare(password, user[0].encrypted_password);
+    const match = await bcrypt.compare(password, user[0].password_encrypted);
     if (match) {
       result = true;
       message = "Success";
