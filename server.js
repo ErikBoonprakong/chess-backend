@@ -74,7 +74,12 @@ async function postAccount(server) {
   // const { username, password, confirmation } = await server.body;
   // server.json({ details: username, password, confirmation }, 200);
   const { username, password, confirmation } = await server.body;
-  const authenticated = await validateAccount(username, password, confirmation);
+  const authenticated = await validateAccount(
+    username,
+    password,
+    confirmation,
+    server
+  );
   if (authenticated.result) {
     // server.json({ details: username, password, confirmation }, 200);
     const passwordEncrypted = await createHash(password);
@@ -113,7 +118,7 @@ async function validateLogIn(username, password) {
   return { result, user, message };
 }
 
-async function validateAccount(username, password, confirmation) {
+async function validateAccount(username, password, confirmation, server) {
   server.json({ details: username, password, confirmation }, 200);
   const [userExists] = (
     await client.queryArray({
