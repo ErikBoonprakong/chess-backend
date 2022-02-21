@@ -12,8 +12,8 @@ config({ path: `./.env.${DENO_ENV}`, export: true });
 
 const db = new DB("./chess.db");
 
-const db = new Client(PG_URL);
-await db.connect();
+const client = new Client(PG_URL);
+await client.connect();
 
 const app = new Application();
 const PORT = parseInt(Deno.env.get("PORT")) || 80;
