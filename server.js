@@ -90,7 +90,7 @@ async function postAccount(server) {
     await client.queryArray({
       args: [username, passwordEncrypted],
       text: `INSERT INTO users(username, password_encrypted, created_at, updated_at)
-                   VALUES ($1, $2, DATE('NOW'), TIMESTAMP);`,
+                   VALUES ($1, $2, DATE('NOW'), CURRENT_DATE);`,
     });
     await postLogIn(server);
   } else {
