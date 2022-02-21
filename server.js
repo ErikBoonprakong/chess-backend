@@ -71,21 +71,21 @@ async function postLogIn(server) {
 }
 
 async function postAccount(server) {
-  const { username, password, confirmation } = await server.body;
-  server.json({ details: username, password, confirmation }, 200);
   // const { username, password, confirmation } = await server.body;
-  // const authenticated = await validateAccount(username, password, confirmation);
-  // if (authenticated.result) {
-  //   const passwordEncrypted = await createHash(password);
-  //   await client.queryArray({
-  //     args: [username, passwordEncrypted],
-  //     text: `INSERT INTO users(username, encrypted_password, created_at, updated_at)
-  //                  VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE);`,
-  //   });
-  //   await postLogIn(server);
-  // } else {
-  //   server.json({ message: authenticated.message }, 400);
-  // }
+  // server.json({ details: username, password, confirmation }, 200);
+  const { username, password, confirmation } = await server.body;
+  const authenticated = await validateAccount(username, password, confirmation);
+  if (authenticated.result) {
+    const passwordEncrypted = await createHash(password);
+    await client.queryArray({
+      args: [username, passwordEncrypted],
+      text: `INSERT INTO users(username, encrypted_password, created_at, updated_at)
+                   VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE);`,
+    });
+    await postLogIn(server);
+  } else {
+    server.json({ message: authenticated.message }, 400);
+  }
 }
 
 async function validateLogIn(username, password) {
