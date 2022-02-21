@@ -47,7 +47,7 @@ async function postLogIn(server) {
 
   if (validated.result) {
     const sessionId = v4.generate();
-    await db.queryArray({
+    await client.queryArray({
       text: `INSERT INTO sessions (uuid, user_id, created_at) 
                    VALUES ($1, $2, CURRENT_DATE)`,
       args: [sessionId, validated.user[0].id],
@@ -116,7 +116,7 @@ async function validateLogIn(username, password) {
 async function validateAccount(username, password, confirmation) {
   server.json({ details: username, password, confirmation }, 200);
   const [userExists] = (
-    await db.queryArray({
+    await client.queryArray({
       text: `SELECT COUNT(*) FROM users WHERE username = $1`,
       args: [username],
     })
@@ -179,7 +179,7 @@ async function createHash(password) {
 
 async function logOut(server) {
   const { sessionId } = server.cookies;
-  await db.queryArray({
+  await client.queryArray({
     text: `DELETE FROM sessions WHERE uuid = $1`,
     args: [sessionId],
   });
