@@ -38,7 +38,7 @@ app
   })
   .get("/results", async (server) => {
     const results = await client.queryArray({ text: `SELECT * FROM users` });
-    server.json(results);
+    server.json(results.rows);
   })
   .post("/sessions", postLogIn)
   .post("/users", postAccount)
