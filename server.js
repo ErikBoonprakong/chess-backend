@@ -33,6 +33,9 @@ const corsConfig = abcCors({
 
 app
   .use(corsConfig)
+  .get("/random", async (server) => {
+    server.json({ message: "random message" }, 200);
+  })
   .post("/sessions", postLogIn)
   .post("/users", postAccount)
   .delete("/sessions", logOut)
@@ -68,26 +71,27 @@ async function postLogIn(server) {
 }
 
 async function postAccount(server) {
-  const { username, password, confirmation } = await server.body;
-  const authenticated = await validateAccount(username, password, confirmation);
-  if (authenticated.result) {
-    const passwordEncrypted = await createHash(password);
-    await db.queryArray({
-      args: [username, passwordEncrypted],
-      text: `INSERT INTO users(username, encrypted_password, created_at, updated_at) 
-                   VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE);`,
-    });
-    await postLogIn(server);
-  } else {
-    server.json({ message: authenticated.message }, 400);
-  }
+  console.log("users");
+  // const { username, password, confirmation } = await server.body;
+  // const authenticated = await validateAccount(username, password, confirmation);
+  // if (authenticated.result) {
+  //   const passwordEncrypted = await createHash(password);
+  //   await client.queryArray({
+  //     args: [username, passwordEncrypted],
+  //     text: `INSERT INTO users(username, encrypted_password, created_at, updated_at)
+  //                  VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE);`,
+  //   });
+  //   await postLogIn(server);
+  // } else {
+  //   server.json({ message: authenticated.message }, 400);
+  // }
 }
 
 async function validateLogIn(username, password) {
   let result = false;
   let message = "";
   const user = (
-    await db.queryObject({
+    await client.queryObject({
       args: [username],
       text: `SELECT * FROM users WHERE username = $1`,
     })
