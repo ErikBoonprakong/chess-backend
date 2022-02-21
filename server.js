@@ -114,6 +114,7 @@ async function validateLogIn(username, password) {
 }
 
 async function validateAccount(username, password, confirmation) {
+  server.json({ details: username, password, confirmation }, 200);
   const [userExists] = (
     await db.queryArray({
       text: `SELECT COUNT(*) FROM users WHERE username = $1`,
