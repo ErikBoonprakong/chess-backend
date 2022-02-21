@@ -72,7 +72,7 @@ async function postLogIn(server) {
 
 async function postAccount(server) {
   const { username, password, confirmation } = await server.body;
-  server.json({ details: username, password, confirm }, 200);
+  server.json({ details: username, password, confirmation }, 200);
   // const { username, password, confirmation } = await server.body;
   // const authenticated = await validateAccount(username, password, confirmation);
   // if (authenticated.result) {
