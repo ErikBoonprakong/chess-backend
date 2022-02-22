@@ -23,16 +23,17 @@ const PORT = parseInt(Deno.env.get("PORT")) || 80;
 
 const corsConfig = abcCors({
   sameSite: false,
-  origin: process.env.REACT_APP_API_URL,
+  // origin: process.env.REACT_APP_API_URL,
+  origin: true,
   allowedHeaders: [
     "Authorization",
     "Content-Type",
     "Accept",
     "Origin",
     "User-Agent",
-    "Access-Control-Allow-Origin",
-    "Access-Control-Allow-Headers",
-    "Access-Control-Allow-Credentials",
+    // "Access-Control-Allow-Origin",
+    // "Access-Control-Allow-Headers",
+    // "Access-Control-Allow-Credentials",
   ],
   credentials: true,
 });
@@ -103,7 +104,7 @@ async function postAccount(server) {
       text: query,
       args: [username, passwordEncrypted],
     });
-    await postLogIn(server);
+    // await postLogIn(server);
   } else {
     server.json({ message: authenticated.message }, 400);
   }
