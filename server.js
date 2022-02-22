@@ -52,6 +52,7 @@ app
 async function postLogIn(server) {
   const { username, password } = await server.body;
   const validated = await validateLogIn(username, password);
+  console.log(validated);
 
   if (validated.result) {
     const sessionId = v4.generate();
@@ -212,7 +213,7 @@ async function logOut(server) {
     value: "",
   });
 
-  server.json({ response: "Logged out" }, 200);
+  server.json({ response: "Logged out successfully" }, 200);
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
