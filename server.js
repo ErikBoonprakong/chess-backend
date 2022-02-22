@@ -52,6 +52,7 @@ app
 async function postLogIn(server) {
   const { username, password } = await server.body;
   const validated = await validateLogIn(username, password);
+  console.log(validated);
 
   if (validated.result) {
     const sessionId = v4.generate();
