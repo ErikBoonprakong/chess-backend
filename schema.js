@@ -33,10 +33,12 @@ await client.queryArray(`CREATE TABLE leaderboard (
     FOREIGN KEY(user_id) REFERENCES users(id)
   )`);
 
-await client.queryArray(`CREATE TABLE sessions (
-    uuid TEXT PRIMARY KEY UNIQUE,
-    user_id INTEGER NOT NULL,
-    created_at DATE NOT NULL,
-    FOREIGN KEY(user_id) REFERENCES users(id)
-  )`);
+await client.queryArray(
+  `CREATE TABLE sessions (
+  uuid TEXT PRIMARY KEY UNIQUE,
+  created_at DATE NOT NULL,
+  user_id INTEGER,
+  FOREIGN KEY(user_id) REFERENCES users(id)
+  )`
+);
 // }
