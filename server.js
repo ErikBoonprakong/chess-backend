@@ -12,6 +12,7 @@ config({ path: `./.env.${DENO_ENV}`, export: true });
 
 const db = new DB("./chess.db");
 ///
+
 const PG_URL = Deno.env.get("PG_URL");
 const client = new Client(PG_URL);
 await client.connect();
@@ -19,15 +20,16 @@ await client.connect();
 const app = new Application();
 const PORT = parseInt(Deno.env.get("PORT")) || 80;
 ///please work
+
 const corsConfig = abcCors({
-  origin: true,
+  sameSite: false,
+  origin: process.env.REACT_APP_API_URL,
   allowedHeaders: [
     "Authorization",
     "Content-Type",
     "Accept",
     "Origin",
     "User-Agent",
-    "Access-Control-Allow-Credentials",
   ],
   credentials: true,
 });
