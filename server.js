@@ -51,15 +51,15 @@ app
 
 async function postLogIn(server) {
   const { username, password } = await server.body;
-  const validated = await validateLogIn(username, password);
-  console.log(validated);
-
-  if (validated.result) {
+  const authenticated = await validateLogIn(username, password);
+  if (authenticated.result) {
     const sessionId = v4.generate();
+    const query = `INSERT INTO sessions (uuid, user_id, created_at) 
+                   VALUES ($1, $2, CURRENT_DATE)`;
+
     await client.queryArray({
-      text: `INSERT INTO sessions (uuid, user_id, created_at) 
-                   VALUES ($1, $2, CURRENT_DATE)`,
-      args: [sessionId, validated.user[0].id],
+      text: query,
+      args: [sessionId, authenticated.user[0].id],
     });
     server.setCookie({
       name: "sessionId",
@@ -71,11 +71,11 @@ async function postLogIn(server) {
     });
     server.setCookie({
       name: "user_id",
-      value: validated.user[0].id,
+      value: authenticated.user[0].id,
     });
-    server.json({ message: validated.message }, 200);
+    server.json({ message: authenticated.message }, 200);
   } else {
-    server.json({ message: validated.message });
+    server.json({ message: authenticated.message }, 400);
   }
 }
 
@@ -92,10 +92,11 @@ async function postAccount(server) {
   if (authenticated.result) {
     // server.json({ details: username, password, confirmation }, 200);
     const passwordEncrypted = await createHash(password);
+    const query = `INSERT INTO users(username, password_encrypted, created_at, updated_at)
+                   VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE);`;
     await client.queryArray({
+      text: query,
       args: [username, passwordEncrypted],
-      text: `INSERT INTO users(username, password_encrypted, created_at, updated_at)
-                   VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE);`,
     });
     await postLogIn(server);
   } else {
@@ -108,8 +109,8 @@ async function validateLogIn(username, password) {
   let message = "";
   const user = (
     await client.queryObject({
-      args: [username],
       text: `SELECT * FROM users WHERE username = $1`,
+      args: [username],
     })
   ).rows;
   if (user[0]) {
@@ -193,8 +194,9 @@ async function createHash(password) {
 
 async function logOut(server) {
   const { sessionId } = server.cookies;
+  const query = `DELETE FROM sessions WHERE uuid = $1`;
   await client.queryArray({
-    text: `DELETE FROM sessions WHERE uuid = $1`,
+    text: query,
     args: [sessionId],
   });
 
