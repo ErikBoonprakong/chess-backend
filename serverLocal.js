@@ -52,7 +52,9 @@ app
 
 async function postLogIn(server) {
   const { username, password } = await server.body;
+  console.log(username, password);
   const validated = await validateLogIn(username, password);
+  console.log(validated);
 
   if (validated.result) {
     const sessionId = v4.generate();
@@ -97,7 +99,7 @@ async function postAccount(server) {
                    VALUES (?, ?, datetime('now'), datetime('now'));`,
       [username, passwordEncrypted]
     );
-    await postLogIn(server);
+    // await postLogIn(server);
   } else {
     server.json({ message: authenticated.message }, 400);
   }
