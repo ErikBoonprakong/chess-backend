@@ -27,6 +27,7 @@ const corsConfig = abcCors({
     "Accept",
     "Origin",
     "User-Agent",
+    "Access-Control-Allow-Credentials",
   ],
   credentials: true,
 });
@@ -90,7 +91,6 @@ async function postAccount(server) {
     server
   );
   if (authenticated.result) {
-    // server.json({ details: username, password, confirmation }, 200);
     const passwordEncrypted = await createHash(password);
     const query = `INSERT INTO users(username, password_encrypted, created_at, updated_at)
                    VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE);`;
