@@ -213,7 +213,7 @@ async function logOut(server) {
     value: "",
   });
 
-  server.json({ response: "Logged out successfully" }, 200);
+  server.json({ response: "Log out successful" }, 200);
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
