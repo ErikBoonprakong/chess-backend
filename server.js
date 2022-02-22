@@ -27,6 +27,7 @@ const corsConfig = abcCors({
     "Accept",
     "Origin",
     "User-Agent",
+    "Access-Control-Allow-Credentials",
   ],
   credentials: true,
 });
