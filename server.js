@@ -203,6 +203,11 @@ async function logOut(server) {
   });
 
   await server.setCookie({
+    name: "user",
+    value: "",
+  });
+
+  await server.setCookie({
     name: "user_id",
     value: "",
   });
