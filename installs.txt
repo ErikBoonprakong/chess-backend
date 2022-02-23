@@ -1,0 +1,24 @@
+Erik's notes - Ignore this for now please
+
+write a function that retrieves user id from our database for socket.io
+
+// install node
+brew install node
+
+// initialise npm
+npm init -y
+
+npm install -g n
+n lts
+
+==============================
+FRONTEND
+npm i node-sass react-redux react-router-dom redux socket.io-client aes256
+
+==============================
+BACKEND
+
+npm install socket.io --save
+
+npm i socket.io express cors colors
+npm i -D nodemon
