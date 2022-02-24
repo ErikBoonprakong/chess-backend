@@ -27,9 +27,10 @@ try {
   await db.query(`CREATE TABLE leaderboard (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
-    games_won INTEGER NOT NULL,
-    games_lost INTEGER NOT NULL,
-    games_stalemate INTEGER NOT NULL,
+    won INTEGER NOT NULL,
+    lost INTEGER NOT NULL,
+    stalemate INTEGER NOT NULL,
+    game_fen TEXT NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id)
   )`);
 
@@ -41,5 +42,19 @@ try {
   FOREIGN KEY(user_id) REFERENCES users(id)
   )`
   );
+
+  await db.query(
+    `CREATE TABLE savedgames (
+  id INTEGER PRIMARY KEY ,
+  created_at DATE NOT NULL,
+  user_id INTEGER NOT NULL,
+  reset INTEGER,
+  undo INTEGER
+  in_check INTEGER ,
+  optimal_move INTEGER ,
+  difficulty INTEGER,
+  game_fen TEXT NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES users(id)
+  )`
+  );
 }
-// }

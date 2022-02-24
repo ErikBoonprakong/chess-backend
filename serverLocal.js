@@ -19,7 +19,7 @@ import { config } from "https://deno.land/x/dotenv/mod.ts";
 
 const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
 
-config({ path: `./.env.${DENO_ENV}`, export: true });
+// config({ path: `./.env.${DENO_ENV}`, export: true });
 
 const db = new DB("./chess.db");
 ///
@@ -56,8 +56,10 @@ app
     const results = await client.queryArray({ text: `SELECT * FROM sessions` });
     server.json(results.rows);
   })
+  .get("/savedgames/:user_id", getSavedGamesById)
   .post("/sessions", postLogIn)
   .post("/users", postAccount)
+  .post("/savegames", postSavedGame)
   .delete("/sessions", logOut)
   .start({ port: PORT });
 
@@ -221,6 +223,36 @@ async function logOut(server) {
   });
 
   server.json({ response: "Logged out" }, 200);
+}
+
+async function postSavedGame(server) {
+  const {
+    user_id,
+
+    reset,
+    undo,
+
+    optimalMove,
+    difficulty,
+    game_fen,
+  } = await server.body;
+
+  await db.query(
+    `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, game_fen) VALUES ( datetime('now'), ?,? ,?,?,?,?)`,
+    [user_id, reset, undo, optimalMove, difficulty, game_fen]
+  );
+  server.json({ response: "Game saved, find it in saved games." }, 200);
+}
+
+async function getSavedGamesById(server) {
+  const { user_id } = await server.params;
+
+  const response = [
+    ...db
+      .query(`SELECT * FROM savedgames WHERE user_id = ?`, [user_id])
+      .asObjects(),
+  ];
+  server.json(response, 200);
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
