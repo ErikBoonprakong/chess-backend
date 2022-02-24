@@ -19,7 +19,7 @@ import { config } from "https://deno.land/x/dotenv/mod.ts";
 
 const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
 
-config({ path: `./.env.${DENO_ENV}`, export: true });
+// config({ path: `./.env.${DENO_ENV}`, export: true });
 
 const db = new DB("./chess.db");
 ///
