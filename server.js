@@ -5,6 +5,16 @@ import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
+// //============================================================
+// const express = require("express");
+// const app = express();
+// const server = require("http").createServer(app);
+// const io = require("socket.io").listen(server);
+
+// io.on("connection", (socket) => {
+//   console.log("a user connected");
+// });
+// //=============================================================
 
 const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
 
@@ -24,7 +34,8 @@ const PORT = parseInt(Deno.env.get("PORT")) || 80;
 const corsConfig = abcCors({
   sameSite: false,
   // origin: process.env.REACT_APP_API_URL,
-  origin: true,
+  origin: "*",
+
   allowedHeaders: [
     "Authorization",
     "Content-Type",

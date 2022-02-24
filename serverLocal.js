@@ -6,7 +6,18 @@ import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 
-// const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
+//============================================================
+
+// const httpServer = require("http").createServer();
+// const io = require("socket.io")(httpServer, {
+//   cors: { origin: "http://localhost:3000" },
+// });
+// io.on("connection", (socket) => {
+//   console.log("a user connected");
+// });
+//=============================================================
+
+const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
 
 // config({ path: `./.env.${DENO_ENV}`, export: true });
 

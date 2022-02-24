@@ -128,7 +128,7 @@ socket.on("player", (msg) => {
   if (players == 2) {
     play = false;
     socket.emit("play", msg.roomId);
-    state.innerHTML = "Game in Progress";
+    state.innerHTML = "Game in progress";
   } else state.innerHTML = "Waiting for Second player";
 
   var cfg = {
