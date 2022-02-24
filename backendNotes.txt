@@ -1,0 +1,8 @@
+npm init --yes
+yarn add express socket.io
+npm i -g nodemon
+brew install node
+npm install cors
+npm i cors express nodemon
+
+?? npm install express@4
