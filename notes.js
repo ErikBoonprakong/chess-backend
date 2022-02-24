@@ -1,3 +1,5 @@
+// function to get user id
+
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
 
 const db = new DB("./chess.db");
