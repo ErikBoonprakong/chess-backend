@@ -51,7 +51,7 @@ try {
   created_at DATE NOT NULL,
   user_id INTEGER NOT NULL,
   reset INTEGER,
-  undo INTEGER
+  undo INTEGER,
   in_check INTEGER ,
   optimal_move INTEGER ,
   difficulty INTEGER,
