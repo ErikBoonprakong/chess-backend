@@ -30,7 +30,7 @@ try {
     username TEXT NOT NULL,
     won INTEGER NOT NULL,
     lost INTEGER NOT NULL,
-    stalemate INTEGER NOT NULL,
+    draw INTEGER NOT NULL,
     score INTEGER NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id)
     FOREIGN KEY(username) REFERENCES users(username)

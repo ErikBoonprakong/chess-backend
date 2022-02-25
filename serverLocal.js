@@ -257,7 +257,7 @@ async function getSavedGamesById(server) {
 }
 
 async function postResult(server) {
-  const { user_id, username, won, lost, draw, score } = await server.body;
+  const { user_id, username, won, lost, draw } = await server.body;
   let finalScore = await calculateScore(won, lost, draw);
   await db.query(
     `INSERT INTO leaderboard ( user_id, username, won, lost, draw, score) VALUES ( ?, ?, ?, ?, ?, ?)`,
