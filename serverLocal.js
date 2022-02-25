@@ -57,6 +57,7 @@ app
     server.json(results.rows);
   })
   .get("/savedgames/:user_id", getSavedGamesById)
+  .get("/scores", getScores)
   .post("/sessions", postLogIn)
   .post("/users", postAccount)
   .post("/savegames", postSavedGame)
@@ -276,6 +277,13 @@ async function calculateScore(win, lost, draw) {
     score += 1;
   }
   return score;
+}
+
+async function getScores(server) {
+  const scores = [
+    ...db.query(`SELECT * FROM leaderboard ORDER BY score DESC`).asObjects(),
+  ];
+  return server.json({ leaderboard: scores }, 200);
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
