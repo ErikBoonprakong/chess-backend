@@ -258,8 +258,14 @@ async function getSavedGamesById(server) {
 }
 
 async function postResult(server) {
-  const { user_id, username, won, lost, draw, score } = await server.body;
+  const { username, won, lost, draw } = await server.body;
   let finalScore = await calculateScore(won, lost, draw);
+  let user_id = [
+    ...db
+      .query(`SELECT id FROM users WHERE username = ?`, [username])
+      .asObjects(),
+  ][0].id;
+  console.log(user_id);
   await db.query(
     `INSERT INTO leaderboard ( user_id, username, won, lost, draw, score) VALUES ( ?, ?, ?, ?, ?, ?)`,
     [user_id, username, won, lost, draw, finalScore]
@@ -281,7 +287,11 @@ async function calculateScore(win, lost, draw) {
 
 async function getScores(server) {
   const scores = [
-    ...db.query(`SELECT * FROM leaderboard ORDER BY score DESC`).asObjects(),
+    ...db
+      .query(
+        `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(SCORE) as score FROM leaderboard  GROUP BY user_id ORDER BY score DESC`
+      )
+      .asObjects(),
   ];
   return server.json({ leaderboard: scores }, 200);
 }
