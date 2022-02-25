@@ -60,6 +60,7 @@ app
   .post("/sessions", postLogIn)
   .post("/users", postAccount)
   .post("/savegames", postSavedGame)
+  .post("/leaderboard", postResult)
   .delete("/sessions", logOut)
   .start({ port: PORT });
 
@@ -253,6 +254,28 @@ async function getSavedGamesById(server) {
       .asObjects(),
   ];
   server.json(response, 200);
+}
+
+async function postResult(server) {
+  const { user_id, username, won, lost, draw, score } = await server.body;
+  let finalScore = await calculateScore(won, lost, draw);
+  await db.query(
+    `INSERT INTO leaderboard ( user_id, username, won, lost, draw, score) VALUES ( ?, ?, ?, ?, ?, ?)`,
+    [user_id, username, won, lost, draw, finalScore]
+  );
+  server.json({ response: "Result saved and added to leaderboard." }, 200);
+}
+
+async function calculateScore(win, lost, draw) {
+  let score = 0;
+  if (win) {
+    score += 3;
+  } else if (draw) {
+    score += 2;
+  } else if (lost) {
+    score += 1;
+  }
+  return score;
 }
 
 console.log(`Server running on http://localhost:${PORT}`);

@@ -27,11 +27,13 @@ try {
   await db.query(`CREATE TABLE leaderboard (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
+    username TEXT NOT NULL,
     won INTEGER NOT NULL,
     lost INTEGER NOT NULL,
     stalemate INTEGER NOT NULL,
-    game_fen TEXT NOT NULL,
+    score INTEGER NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id)
+    FOREIGN KEY(username) REFERENCES users(username)
   )`);
 
   await db.query(
