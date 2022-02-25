@@ -13,15 +13,27 @@ const io = require("socket.io")(server, {
 });
 const port = 4000;
 const cors = require("cors");
-
+const clients = [];
 io.on("connection", (socket) => {
-  console.log("a user connected");
   socket.on("new message", (msg) => {
     console.log(msg);
     io.emit("new message", msg);
   });
   socket.on("new move", (move) => {
     io.emit("new move", move);
+  });
+  socket.on("join room", (name) => {
+    if (!clients.includes(name)) {
+      clients.push(name);
+    }
+    io.emit("player list", clients);
+    if (clients.length === 2) {
+      io.emit("new message", `${clients[0]} vs ${clients[1]}`);
+    }
+  });
+  socket.on("leave room", (name) => {
+    clients.splice(clients.indexOf(name), 1);
+    io.emit("player list", clients);
   });
 });
 
