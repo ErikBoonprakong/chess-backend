@@ -13,8 +13,10 @@ config({ path: `./.env.${DENO_ENV}`, export: true });
 const db = new DB("./chess.db");
 ///
 
-const PG_URL = Deno.env.get("PG_URL");
-const client = new Client(PG_URL);
+// const PG_URL = Deno.env.get("PG_URL");
+const client = new Client(
+  "postgres://tttobjma:pKaSKSQHgw7OFMfc_BdLPl0YquGRns8d@kesavan.db.elephantsql.com/tttobjma"
+);
 await client.connect();
 
 const app = new Application();
@@ -70,7 +72,7 @@ async function postLogIn(server) {
   const authenticated = await validateLogIn(username, password);
   if (authenticated.result) {
     const sessionId = v4.generate();
-    const query = `INSERT INTO sessions (uuid, user_id, created_at) 
+    const query = `INSERT INTO sessions (uuid, user_id, created_at)
                    VALUES ($1, $2, CURRENT_DATE)`;
 
     await client.queryArray({
