@@ -13,8 +13,10 @@ config({ path: `./.env.${DENO_ENV}`, export: true });
 const db = new DB("./chess.db");
 ///
 
-const PG_URL = Deno.env.get("PG_URL");
-const client = new Client(PG_URL);
+// const PG_URL = Deno.env.get("PG_URL");
+const client = new Client(
+  "postgres://tttobjma:pKaSKSQHgw7OFMfc_BdLPl0YquGRns8d@kesavan.db.elephantsql.com/tttobjma"
+);
 await client.connect();
 
 const app = new Application();
@@ -70,7 +72,7 @@ async function postLogIn(server) {
   const authenticated = await validateLogIn(username, password);
   if (authenticated.result) {
     const sessionId = v4.generate();
-    const query = `INSERT INTO sessions (uuid, user_id, created_at) 
+    const query = `INSERT INTO sessions (uuid, user_id, created_at)
                    VALUES ($1, $2, CURRENT_DATE)`;
 
     await client.queryArray({
@@ -262,7 +264,7 @@ async function postSavedGame(server) {
     game_fen,
   } = await server.body;
   await client.queryArray({
-    text: `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, game_fen) VALUES ( datetime('now'), ?,? ,?,?,?,?)`,
+    text: `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, game_fen) VALUES ( datetime('now'), $1,$2,$3,$4,$5,$6)`,
     args: [user_id, reset, undo, optimalMove, difficulty, game_fen],
   });
   server.json({ response: "Game saved, find it in saved games." }, 200);
@@ -271,12 +273,10 @@ async function postSavedGame(server) {
 async function getSavedGamesById(server) {
   const { user_id } = await server.params;
 
-  const [response] = 
-    client.queryArray({
-      text: `SELECT * FROM savedgames WHERE user_id = $1`,
-      args: [user_id],
-    }).rows,
-  ;
+  const [response] = client.queryArray({
+    text: `SELECT * FROM savedgames WHERE user_id = $1`,
+    args: [user_id],
+  }).rows;
   server.json(response, 200);
 }
 
@@ -291,7 +291,7 @@ async function postResult(server) {
   ][0].id;
   console.log(user_id);
   await client.queryArray({
-    text: `INSERT INTO leaderboard ( user_id, username, won, lost, draw, score) VALUES ( ?, ?, ?, ?, ?, ?)`,
+    text: `INSERT INTO leaderboard ( user_id, username, won, lost, draw, score) VALUES ( $1,$2,$3,$4,$5,$6)`,
     args: [user_id, username, won, lost, draw, finalScore],
   });
   server.json({ response: "Result saved and added to leaderboard." }, 200);
