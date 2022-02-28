@@ -280,12 +280,11 @@ async function postSavedGame(server) {
 
 async function getSavedGamesById(server) {
   const { user_id } = await server.params;
-
-  const response = client.queryObject({
+  const results = await client.queryObject({
     text: `SELECT * FROM savedgames WHERE user_id = $1`,
     args: [user_id],
   });
-  server.json(response.rows, 200);
+  server.json(results.rows, 200);
 }
 
 async function postResult(server) {
