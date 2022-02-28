@@ -291,10 +291,10 @@ async function postResult(server) {
   const { username, won, lost, draw } = await server.body;
   let finalScore = await calculateScore(won, lost, draw);
   let user_id = [
-    ...client.queryArray({
+    ...(await client.queryObject({
       text: `SELECT id FROM users WHERE username = $1`,
       args: [username],
-    }).rows,
+    }).rows),
   ][0].id;
   console.log(user_id);
   await client.queryArray({
@@ -318,11 +318,11 @@ async function calculateScore(win, lost, draw) {
 
 async function getScores(server) {
   const scores = [
-    ...client.queryArray({
+    ...(await client.queryObject({
       text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(SCORE) as score FROM leaderboard  GROUP BY user_id ORDER BY score DESC`,
-    }).rows,
+    })),
   ];
-  return server.json({ leaderboard: scores }, 200);
+  return server.json({ leaderboard: scores.rows }, 200);
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
