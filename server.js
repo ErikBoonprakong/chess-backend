@@ -262,7 +262,7 @@ async function postSavedGame(server) {
     game_fen,
   } = await server.body;
   await client.queryArray({
-    text: `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, game_fen) VALUES ( datetime('now'), ?,? ,?,?,?,?)`,
+    text: `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, game_fen) VALUES ( datetime('now'), $1,$2,$3,$4,$5,$6)`,
     args: [user_id, reset, undo, optimalMove, difficulty, game_fen],
   });
   server.json({ response: "Game saved, find it in saved games." }, 200);
@@ -271,12 +271,10 @@ async function postSavedGame(server) {
 async function getSavedGamesById(server) {
   const { user_id } = await server.params;
 
-  const [response] = 
-    client.queryArray({
-      text: `SELECT * FROM savedgames WHERE user_id = $1`,
-      args: [user_id],
-    }).rows,
-  ;
+  const [response] = client.queryArray({
+    text: `SELECT * FROM savedgames WHERE user_id = $1`,
+    args: [user_id],
+  }).rows;
   server.json(response, 200);
 }
 
@@ -291,7 +289,7 @@ async function postResult(server) {
   ][0].id;
   console.log(user_id);
   await client.queryArray({
-    text: `INSERT INTO leaderboard ( user_id, username, won, lost, draw, score) VALUES ( ?, ?, ?, ?, ?, ?)`,
+    text: `INSERT INTO leaderboard ( user_id, username, won, lost, draw, score) VALUES ( $1,$2,$3,$4,$5,$6)`,
     args: [user_id, username, won, lost, draw, finalScore],
   });
   server.json({ response: "Result saved and added to leaderboard." }, 200);
