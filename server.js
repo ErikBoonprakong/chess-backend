@@ -21,7 +21,7 @@ const app = new Application();
 const PORT = parseInt(Deno.env.get("PORT")) || 80;
 
 const corsConfig = abcCors({
-  sameSite: "none",
+  sameSite: "None",
   // origin: process.env.REACT_APP_API_URL,
   // origin: "*",
   origin:
