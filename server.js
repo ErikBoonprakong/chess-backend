@@ -54,9 +54,11 @@ app
     const results = await client.queryArray({ text: `SELECT * FROM users` });
     server.json(results.rows);
   })
-  .get("/saves", async (server) => {
+  .get("/saves/:id", async (server) => {
+    const { id } = await server.params;
     const results = await client.queryObject({
-      text: `SELECT * FROM savedgames`,
+      text: `SELECT * FROM savedgames WHERE user_id = $1`,
+      args: [id],
     });
     server.json(results.rows);
   })
@@ -279,11 +281,11 @@ async function postSavedGame(server) {
 async function getSavedGamesById(server) {
   const { user_id } = await server.params;
 
-  const [response] = client.queryObject({
+  const response = client.queryObject({
     text: `SELECT * FROM savedgames WHERE user_id = $1`,
     args: [user_id],
-  }).rows;
-  server.json(response, 200);
+  });
+  server.json(response.rows, 200);
 }
 
 async function postResult(server) {
