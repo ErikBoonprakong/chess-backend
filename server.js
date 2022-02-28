@@ -94,7 +94,15 @@ async function postLogIn(server) {
       },
       { secure: true, sameSite: "none" }
     );
-    server.json({ message: authenticated.message }, 200);
+    server.json(
+      {
+        message: authenticated.message,
+        sessionId: sessionId,
+        user: username,
+        user_id: authenticated.user[0].id,
+      },
+      200
+    );
   } else {
     server.json({ message: authenticated.message }, 400);
   }
