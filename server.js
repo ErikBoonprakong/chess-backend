@@ -316,12 +316,25 @@ async function calculateScore(win, lost, draw) {
 }
 
 async function getScores(server) {
-  const scores = [
-    ...(await client.queryObject({
-      text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY SUM(score) DESC`,
-    })),
-  ];
-  return server.json({ leaderboard: scores.rows }, 200);
+  // const scores = [
+  //   ...(await client.queryObject({
+  //     text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY SUM(score) DESC`,
+  //   })),
+  // ];
+
+  // .get("/saves", async (server) => {
+  //     const results = await client.queryObject({
+  //       text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY score DESC`,
+  //     });
+  //     console.log(results.rows);
+  //     server.json(results.rows);
+  //   })
+  console.log("checking...");
+  const results = await client.queryObject({
+    text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY score DESC`,
+  });
+  console.log(results.rows);
+  return server.json({ leaderboard: results.rows }, 200);
 }
 
 console.log(`Server running on http://localhost:${PORT}`);

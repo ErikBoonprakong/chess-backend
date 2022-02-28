@@ -69,10 +69,10 @@ await client.queryArray(
 
 await client.queryArray(
   `INSERT INTO leaderboard (user_id, username, won, lost, draw, score) VALUES 
-    (1, 'chessyemErik', '10', 0, 0, 30), 
-    (2, 'chessyemMeg', '5', 25, 5, 50), 
-    (3, 'chessyemYassin', '1', 1, 30, 64), 
-    (4, 'chessyemPersonOne', '1', 1, 1, 6), 
-    (5, 'chessyemPersonTwo', '3', 0, 0, 9)`
+    (1, 'chessyemErik', '10', '0', '0', '30'), 
+    (2, 'chessyemMeg', '5', '25', '5', '50'), 
+    (3, 'chessyemYassin', '1', '1', '30', '64'), 
+    (4, 'chessyemPersonOne', '1', '1', '1', '6'), 
+    (5, 'chessyemPersonTwo', '3', '0', '0', '9')`
 );
 // }
