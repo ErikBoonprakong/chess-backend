@@ -24,8 +24,10 @@ const corsConfig = abcCors({
   sameSite: "None",
   // origin: process.env.REACT_APP_API_URL,
   // origin: "*",
-  origin:
+  origin: [
     "https://621ca44843a9d90007891a54--hardcore-kepler-5bee6e.netlify.app",
+    "https://hardcore-kepler-5bee6e.netlify.app",
+  ],
 
   allowedHeaders: [
     "Authorization",
@@ -70,18 +72,27 @@ async function postLogIn(server) {
       text: query,
       args: [sessionId, authenticated.user[0].id],
     });
-    server.setCookie({
-      name: "sessionId",
-      value: sessionId,
-    });
-    server.setCookie({
-      name: "user",
-      value: username,
-    });
-    server.setCookie({
-      name: "user_id",
-      value: authenticated.user[0].id,
-    });
+    server.setCookie(
+      {
+        name: "sessionId",
+        value: sessionId,
+      },
+      { secure: true, sameSite: "none" }
+    );
+    server.setCookie(
+      {
+        name: "user",
+        value: username,
+      },
+      { secure: true, sameSite: "none" }
+    );
+    server.setCookie(
+      {
+        name: "user_id",
+        value: authenticated.user[0].id,
+      },
+      { secure: true, sameSite: "none" }
+    );
     server.json({ message: authenticated.message }, 200);
   } else {
     server.json({ message: authenticated.message }, 400);
