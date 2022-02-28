@@ -56,7 +56,7 @@ app
   })
   .get("/saves", async (server) => {
     const results = await client.queryObject({
-      text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(SCORE) as score FROM leaderboard GROUP BY username ORDER BY score DESC`,
+      text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY SUM(score) DESC`,
     });
     server.json(results.rows);
   })
@@ -317,7 +317,7 @@ async function calculateScore(win, lost, draw) {
 async function getScores(server) {
   const scores = [
     ...(await client.queryObject({
-      text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(SCORE) as score FROM leaderboard GROUP BY username ORDER BY score DESC`,
+      text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY SUM(score) DESC`,
     })),
   ];
   return server.json({ leaderboard: scores.rows }, 200);
