@@ -54,6 +54,12 @@ app
     const results = await client.queryArray({ text: `SELECT * FROM users` });
     server.json(results.rows);
   })
+  .get("/saves", async (server) => {
+    const results = await client.queryArray({
+      text: `SELECT * FROM savedgames`,
+    });
+    server.json(results.rows);
+  })
   .get("/sessions", async (server) => {
     const results = await client.queryArray({ text: `SELECT * FROM sessions` });
     server.json(results.rows);
