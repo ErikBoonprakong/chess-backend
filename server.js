@@ -54,11 +54,9 @@ app
     const results = await client.queryArray({ text: `SELECT * FROM users` });
     server.json(results.rows);
   })
-  .get("/saves/:id", async (server) => {
-    const { id } = await server.params;
+  .get("/leaderboard", async (server) => {
     const results = await client.queryObject({
-      text: `SELECT * FROM savedgames WHERE user_id = $1`,
-      args: [id],
+      text: `SELECT * FROM leaderboard`,
     });
     server.json(results.rows);
   })
@@ -319,7 +317,7 @@ async function calculateScore(win, lost, draw) {
 async function getScores(server) {
   const scores = [
     ...(await client.queryObject({
-      text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(SCORE) as score FROM leaderboard  GROUP BY user_id ORDER BY score DESC`,
+      text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(SCORE) as score FROM leaderboard GROUP BY leaderboard.username ORDER BY score DESC`,
     })),
   ];
   return server.json({ leaderboard: scores.rows }, 200);
