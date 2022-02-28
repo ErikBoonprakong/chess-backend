@@ -56,8 +56,12 @@ app
     const results = await client.queryArray({ text: `SELECT * FROM sessions` });
     server.json(results.rows);
   })
+  .get("/savedgames/:user_id", getSavedGamesById)
+  .get("/scores", getScores)
   .post("/sessions", postLogIn)
   .post("/users", postAccount)
+  .post("/savegames", postSavedGame)
+  .post("/leaderboard", postResult)
   .delete("/sessions", logOut)
   .start({ port: PORT });
 
@@ -244,6 +248,74 @@ async function logOut(server) {
   });
 
   server.json({ response: "Log out successful" }, 200);
+}
+
+async function postSavedGame(server) {
+  const {
+    user_id,
+
+    reset,
+    undo,
+
+    optimalMove,
+    difficulty,
+    game_fen,
+  } = await server.body;
+  await client.queryArray({
+    text: `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, game_fen) VALUES ( datetime('now'), ?,? ,?,?,?,?)`,
+    args: [user_id, reset, undo, optimalMove, difficulty, game_fen],
+  });
+  server.json({ response: "Game saved, find it in saved games." }, 200);
+}
+
+async function getSavedGamesById(server) {
+  const { user_id } = await server.params;
+
+  const response = [
+    ...client.queryArray({
+      text: `SELECT * FROM savedgames WHERE user_id = $1`,
+      args: [user_id],
+    }).rows,
+  ];
+  server.json(response, 200);
+}
+
+async function postResult(server) {
+  const { username, won, lost, draw } = await server.body;
+  let finalScore = await calculateScore(won, lost, draw);
+  let user_id = [
+    ...client.queryArray({
+      text: `SELECT id FROM users WHERE username = $1`,
+      args: [username],
+    }).rows,
+  ][0].id;
+  console.log(user_id);
+  await client.queryArray({
+    text: `INSERT INTO leaderboard ( user_id, username, won, lost, draw, score) VALUES ( ?, ?, ?, ?, ?, ?)`,
+    args: [user_id, username, won, lost, draw, finalScore],
+  });
+  server.json({ response: "Result saved and added to leaderboard." }, 200);
+}
+
+async function calculateScore(win, lost, draw) {
+  let score = 0;
+  if (win) {
+    score += 3;
+  } else if (draw) {
+    score += 2;
+  } else if (lost) {
+    score += 1;
+  }
+  return score;
+}
+
+async function getScores(server) {
+  const scores = [
+    ...client.queryArray({
+      text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(SCORE) as score FROM leaderboard  GROUP BY user_id ORDER BY score DESC`,
+    }).rows,
+  ];
+  return server.json({ leaderboard: scores }, 200);
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
