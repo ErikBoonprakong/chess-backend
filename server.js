@@ -19,12 +19,13 @@ await client.connect();
 
 const app = new Application();
 const PORT = parseInt(Deno.env.get("PORT")) || 80;
-///please work
 
 const corsConfig = abcCors({
   sameSite: false,
-  origin: process.env.REACT_APP_API_URL,
+  // origin: process.env.REACT_APP_API_URL,
   // origin: "*",
+  origin:
+    "https://621ca44843a9d90007891a54--hardcore-kepler-5bee6e.netlify.app",
 
   allowedHeaders: [
     "Authorization",
