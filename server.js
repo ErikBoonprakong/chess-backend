@@ -55,7 +55,7 @@ app
     server.json(results.rows);
   })
   .get("/saves", async (server) => {
-    const results = await client.queryArray({
+    const results = await client.queryObject({
       text: `SELECT * FROM savedgames`,
     });
     server.json(results.rows);
@@ -279,7 +279,7 @@ async function postSavedGame(server) {
 async function getSavedGamesById(server) {
   const { user_id } = await server.params;
 
-  const [response] = client.queryArray({
+  const [response] = client.queryObject({
     text: `SELECT * FROM savedgames WHERE user_id = $1`,
     args: [user_id],
   }).rows;
