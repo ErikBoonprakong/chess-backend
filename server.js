@@ -290,13 +290,13 @@ async function getSavedGamesById(server) {
 async function postResult(server) {
   const { username, won, lost, draw } = await server.body;
   let finalScore = await calculateScore(won, lost, draw);
-  let user_id = [
-    ...(await client.queryObject({
-      text: `SELECT id FROM users WHERE username = $1`,
-      args: [username],
-    }).rows),
-  ][0].id;
-  console.log(user_id);
+  console.log("before user_id....");
+  let user_id = await client.queryObject({
+    text: `SELECT id FROM users WHERE username = $1`,
+    args: [username],
+  });
+  console.log(user_id.rows[0].id);
+  user_id = user_id.rows[0].id;
   await client.queryArray({
     text: `INSERT INTO leaderboard ( user_id, username, won, lost, draw, score) VALUES ( $1,$2,$3,$4,$5,$6)`,
     args: [user_id, username, won, lost, draw, finalScore],
