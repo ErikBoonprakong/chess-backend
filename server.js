@@ -269,11 +269,12 @@ async function postSavedGame(server) {
 
     optimalMove,
     difficulty,
+    userColour,
     game_fen,
   } = await server.body;
   await client.queryArray({
-    text: `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, game_fen) VALUES ( CURRENT_DATE, $1,$2,$3,$4,$5,$6)`,
-    args: [user_id, reset, undo, optimalMove, difficulty, game_fen],
+    text: `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, user_colour, game_fen) VALUES ( CURRENT_DATE, $1,$2,$3,$4,$5,$6,$7)`,
+    args: [user_id, reset, undo, optimalMove, difficulty, userColour, game_fen],
   });
   server.json({ response: "Game saved, find it in saved games." }, 200);
 }
@@ -317,20 +318,6 @@ async function calculateScore(win, lost, draw) {
 }
 
 async function getScores(server) {
-  // const scores = [
-  //   ...(await client.queryObject({
-  //     text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY SUM(score) DESC`,
-  //   })),
-  // ];
-
-  // .get("/saves", async (server) => {
-  //     const results = await client.queryObject({
-  //       text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY score DESC`,
-  //     });
-  //     console.log(results.rows);
-  //     server.json(results.rows);
-  //   })
-  console.log("checking...");
   const results = await client.queryObject({
     text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY score DESC`,
   });
