@@ -5,16 +5,6 @@ import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
-// //============================================================
-// const express = require("express");
-// const app = express();
-// const server = require("http").createServer(app);
-// const io = require("socket.io").listen(server);
-
-// io.on("connection", (socket) => {
-//   console.log("a user connected");
-// });
-// //=============================================================
 
 const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
 
@@ -23,18 +13,25 @@ config({ path: `./.env.${DENO_ENV}`, export: true });
 const db = new DB("./chess.db");
 ///
 
-const PG_URL = Deno.env.get("PG_URL");
-const client = new Client(PG_URL);
+// const PG_URL = Deno.env.get("PG_URL");
+const client = new Client(
+  "postgres://tttobjma:pKaSKSQHgw7OFMfc_BdLPl0YquGRns8d@kesavan.db.elephantsql.com/tttobjma"
+);
 await client.connect();
 
 const app = new Application();
 const PORT = parseInt(Deno.env.get("PORT")) || 80;
-///please work
 
 const corsConfig = abcCors({
-  sameSite: false,
+  sameSite: "None",
   // origin: process.env.REACT_APP_API_URL,
-  origin: "*",
+  // origin: "*",
+  origin: [
+    "https://621ca44843a9d90007891a54--hardcore-kepler-5bee6e.netlify.app",
+    "https://hardcore-kepler-5bee6e.netlify.app",
+    "http://localhost:3000",
+    "http://localhost:3001",
+  ],
 
   allowedHeaders: [
     "Authorization",
@@ -58,12 +55,23 @@ app
     const results = await client.queryArray({ text: `SELECT * FROM users` });
     server.json(results.rows);
   })
+  .get("/saves", async (server) => {
+    const results = await client.queryObject({
+      text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY score DESC`,
+    });
+    console.log(results.rows);
+    server.json(results.rows);
+  })
   .get("/sessions", async (server) => {
     const results = await client.queryArray({ text: `SELECT * FROM sessions` });
     server.json(results.rows);
   })
+  .get("/savedgames/:user_id", getSavedGamesById)
+  .get("/scores", getScores)
   .post("/sessions", postLogIn)
   .post("/users", postAccount)
+  .post("/savegames", postSavedGame)
+  .post("/leaderboard", postResult)
   .delete("/sessions", logOut)
   .start({ port: PORT });
 
@@ -72,26 +80,43 @@ async function postLogIn(server) {
   const authenticated = await validateLogIn(username, password);
   if (authenticated.result) {
     const sessionId = v4.generate();
-    const query = `INSERT INTO sessions (uuid, user_id, created_at) 
+    const query = `INSERT INTO sessions (uuid, user_id, created_at)
                    VALUES ($1, $2, CURRENT_DATE)`;
 
     await client.queryArray({
       text: query,
       args: [sessionId, authenticated.user[0].id],
     });
-    server.setCookie({
-      name: "sessionId",
-      value: sessionId,
-    });
-    server.setCookie({
-      name: "user",
-      value: username,
-    });
-    server.setCookie({
-      name: "user_id",
-      value: authenticated.user[0].id,
-    });
-    server.json({ message: authenticated.message }, 200);
+    server.setCookie(
+      {
+        name: "sessionId",
+        value: sessionId,
+      },
+      { secure: true, sameSite: "none" }
+    );
+    server.setCookie(
+      {
+        name: "user",
+        value: username,
+      },
+      { secure: true, sameSite: "none" }
+    );
+    server.setCookie(
+      {
+        name: "user_id",
+        value: authenticated.user[0].id,
+      },
+      { secure: true, sameSite: "none" }
+    );
+    server.json(
+      {
+        message: authenticated.message,
+        sessionId: sessionId,
+        user: username,
+        user_id: authenticated.user[0].id,
+      },
+      200
+    );
   } else {
     server.json({ message: authenticated.message }, 400);
   }
@@ -233,6 +258,84 @@ async function logOut(server) {
   });
 
   server.json({ response: "Log out successful" }, 200);
+}
+
+async function postSavedGame(server) {
+  const {
+    user_id,
+
+    reset,
+    undo,
+
+    optimalMove,
+    difficulty,
+    game_fen,
+  } = await server.body;
+  await client.queryArray({
+    text: `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, game_fen) VALUES ( CURRENT_DATE, $1,$2,$3,$4,$5,$6)`,
+    args: [user_id, reset, undo, optimalMove, difficulty, game_fen],
+  });
+  server.json({ response: "Game saved, find it in saved games." }, 200);
+}
+
+async function getSavedGamesById(server) {
+  const { user_id } = await server.params;
+  const results = await client.queryObject({
+    text: `SELECT * FROM savedgames WHERE user_id = $1`,
+    args: [user_id],
+  });
+  server.json(results.rows, 200);
+}
+
+async function postResult(server) {
+  const { username, won, lost, draw } = await server.body;
+  let finalScore = await calculateScore(won, lost, draw);
+  let user_id = [
+    ...(await client.queryObject({
+      text: `SELECT id FROM users WHERE username = $1`,
+      args: [username],
+    }).rows),
+  ][0].id;
+  console.log(user_id);
+  await client.queryArray({
+    text: `INSERT INTO leaderboard ( user_id, username, won, lost, draw, score) VALUES ( $1,$2,$3,$4,$5,$6)`,
+    args: [user_id, username, won, lost, draw, finalScore],
+  });
+  server.json({ response: "Result saved and added to leaderboard." }, 200);
+}
+
+async function calculateScore(win, lost, draw) {
+  let score = 0;
+  if (win) {
+    score += 3;
+  } else if (draw) {
+    score += 2;
+  } else if (lost) {
+    score += 1;
+  }
+  return score;
+}
+
+async function getScores(server) {
+  // const scores = [
+  //   ...(await client.queryObject({
+  //     text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY SUM(score) DESC`,
+  //   })),
+  // ];
+
+  // .get("/saves", async (server) => {
+  //     const results = await client.queryObject({
+  //       text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY score DESC`,
+  //     });
+  //     console.log(results.rows);
+  //     server.json(results.rows);
+  //   })
+  console.log("checking...");
+  const results = await client.queryObject({
+    text: `SELECT username, SUM(won) as won, SUM(lost) as lost, SUM(draw) as draw, SUM(score) as score FROM leaderboard GROUP BY username ORDER BY score DESC`,
+  });
+  console.log(results.rows);
+  return server.json({ leaderboard: results.rows }, 200);
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
