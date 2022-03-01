@@ -90,7 +90,15 @@ async function postLogIn(server) {
       name: "user_id",
       value: validated.user[0].id,
     });
-    server.json({ message: validated.message }, 200);
+    server.json(
+      {
+        message: validated.message,
+        sessionId: sessionId,
+        user: username,
+        user_id: validated.user[0].id,
+      },
+      200
+    );
   } else {
     server.json({ message: validated.message });
   }
@@ -230,18 +238,17 @@ async function logOut(server) {
 async function postSavedGame(server) {
   const {
     user_id,
-
     reset,
     undo,
-
     optimalMove,
     difficulty,
+    userColour,
     game_fen,
   } = await server.body;
-
+  console.log(user_id);
   await db.query(
-    `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, game_fen) VALUES ( datetime('now'), ?,? ,?,?,?,?)`,
-    [user_id, reset, undo, optimalMove, difficulty, game_fen]
+    `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty,userColour, game_fen) VALUES ( datetime('now'), ?,? ,?,?,?,?,?)`,
+    [user_id, reset, undo, optimalMove, difficulty, userColour, game_fen]
   );
   server.json({ response: "Game saved, find it in saved games." }, 200);
 }
