@@ -12,7 +12,9 @@ const io = require("socket.io")(server, {
   },
 });
 const port = process.env.PORT || 4000;
+console.log("starting up.........");
 const cors = require("cors");
+const { uptime } = require("process");
 const clients = [];
 io.on("connection", (socket) => {
   socket.on("new message", (msg) => {
