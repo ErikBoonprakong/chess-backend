@@ -54,7 +54,7 @@ await client.queryArray(`CREATE TABLE savedgames (
   in_check INTEGER ,
   optimal_move INTEGER ,
   difficulty INTEGER,
-  user_colour TEXT,
+  userColour TEXT,
   game_fen TEXT NOT NULL,
   FOREIGN KEY(user_id) REFERENCES users(id)
   )`);

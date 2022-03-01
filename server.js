@@ -273,7 +273,7 @@ async function postSavedGame(server) {
     game_fen,
   } = await server.body;
   await client.queryArray({
-    text: `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, user_colour, game_fen) VALUES ( CURRENT_DATE, $1,$2,$3,$4,$5,$6,$7)`,
+    text: `INSERT INTO savedgames ( created_at, user_id, reset, undo,  optimal_move, difficulty, userColour, game_fen) VALUES ( CURRENT_DATE, $1,$2,$3,$4,$5,$6,$7)`,
     args: [user_id, reset, undo, optimalMove, difficulty, userColour, game_fen],
   });
   server.json({ response: "Game saved, find it in saved games." }, 200);
