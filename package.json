@@ -9,7 +9,7 @@
     "nodemon": "^2.0.15"
   },
   "scripts": {
-    "start": "nodemon chat.js"
+    "start": "node chat.js"
   },
   "name": "chess-backend",
   "description": "chess back end",
