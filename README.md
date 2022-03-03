@@ -52,7 +52,7 @@ The frontend React application requires this backend server to be running to wor
 
 We have also written tests to ensure production of the schema has been carried out as originally specified.
 
-## Contributors
+## Developers
 
 The Developers that worked on this project are:
 
