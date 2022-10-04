@@ -50,7 +50,7 @@ The frontend React application requires this backend server to be running to wor
 
 ![Users Database](./assets/schema.png)
 
-We have also written tests to ensure production of the schema has been carried out as originally specified
+We have also written tests to ensure production of the schema has been carried out as originally specified.
 
 ## Contributors
 
