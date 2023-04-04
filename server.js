@@ -2,9 +2,10 @@ import { Application } from "https://deno.land/x/abc/mod.ts";
 import { DB } from "https://deno.land/x/sqlite@v2.5.0/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
-import { v4 } from "https://deno.land/std/uuid/mod.ts";
+import { v1 } from "https://deno.land/std/uuid/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
+import * as mod from "https://deno.land/std@0.182.0/uuid/mod.ts";
 
 const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
 
@@ -20,7 +21,7 @@ const client = new Client(
 await client.connect();
 
 const app = new Application();
-const PORT = parseInt(Deno.env.get("PORT")) || 80;
+const PORT = parseInt(Deno.env.get("PORT")) || 8080;
 
 const corsConfig = abcCors({
   sameSite: "None",
@@ -79,7 +80,7 @@ async function postLogIn(server) {
   const { username, password } = await server.body;
   const authenticated = await validateLogIn(username, password);
   if (authenticated.result) {
-    const sessionId = v4.generate();
+    const sessionId = v1.generate();
     const query = `INSERT INTO sessions (uuid, user_id, created_at)
                    VALUES ($1, $2, CURRENT_DATE)`;
 
