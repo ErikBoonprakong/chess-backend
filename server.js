@@ -32,6 +32,7 @@ const corsConfig = abcCors({
     "https://hardcore-kepler-5bee6e.netlify.app",
     "http://localhost:3000",
     "http://localhost:3001",
+    "https://chessyem.netlify.app"
   ],
 
   allowedHeaders: [
