@@ -19,7 +19,7 @@
     "nodemon": "^2.0.15"
   },
   "scripts": {
-    "start": "node chat.js"
+    "start": "node app.js"
   },
   "name": "chess-backend",
   "description": "chess back end",
