@@ -14,7 +14,7 @@ This is the backend server of the Chess app that handles http requests from the 
 
 ## Technologies
 
-This repository uses [deno](https://deno.land/manual/getting_started/installation), as well as [socket.io](https://socket.io/docs/v4/) to run its files.
+This repository originally used [deno](https://deno.land/manual/getting_started/installation), as well as [socket.io](https://socket.io/docs/v4/) to run its files. However, I rewrote the server in 2025 to use nodejs instead of Deno due to Deno's fall into obscurity.
 
 We use [PostgreSQL](https://www.postgresql.org/) to host our database.
 
@@ -25,17 +25,7 @@ The front end repository which is related to the servers can be found [here](htt
 Run the following command into your terminal to initiate the backend server:
 
 ```
-deno run --allow-net --allow-read --allow-write server.js
-```
-
-If you would like your deno script to run continuously, you can make use of the following commands:
-
-```
-deno install -qAf --unstable https://raw.githubusercontent.com/nnmrts/denon/patch-4/denon.ts
-```
-
-```
-deno run --allow-net --allow-read --allow-write server.js
+node app.js
 ```
 
 In order to run the node server which contains the socket for communication between the server and clients, use the following command:
