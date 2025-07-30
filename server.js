@@ -7,7 +7,7 @@ import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 import * as mod from "https://deno.land/std@0.182.0/uuid/mod.ts";
 
-const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
+const DENO_ENV = Deno.env.get("DENO_ENV") ?? "production";
 
 config({ path: `./.env.${DENO_ENV}`, export: true });
 
@@ -16,7 +16,7 @@ const db = new DB("./chess.db");
 
 // const PG_URL = Deno.env.get("PG_URL");
 const client = new Client(
-  "postgres://tttobjma:pKaSKSQHgw7OFMfc_BdLPl0YquGRns8d@kesavan.db.elephantsql.com/tttobjma"
+  "postgres://ublctmmglou7hi:p31c8ddbd29c68038ec7f6280d007c005f469b1479e02b9d07e77054a2db7bcab@cepejvghn9noue.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/ddtcrljun8vv5d"
 );
 await client.connect();
 

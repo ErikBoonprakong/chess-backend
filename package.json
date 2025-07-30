@@ -1,8 +1,15 @@
 {
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "colors": "^1.4.0",
+    "connect": "^3.7.0",
+    "cookieparser": "^0.1.0",
     "cors": "^2.8.5",
-    "express": "^4.17.3",
+    "express": "^4.21.2",
+    "node": "^24.2.0",
+    "pg": "^8.16.3",
+    "postgres": "^3.4.7",
+    "shortid": "^2.2.17",
     "socket.io": "^4.4.1"
   },
   "devDependencies": {

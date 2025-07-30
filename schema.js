@@ -2,7 +2,17 @@ import { DB } from "https://deno.land/x/sqlite/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 
 const client = new Client(
-  "postgres://tttobjma:pKaSKSQHgw7OFMfc_BdLPl0YquGRns8d@kesavan.db.elephantsql.com/tttobjma"
+  //"postgres://ublctmmglou7hi:p31c8ddbd29c68038ec7f6280d007c005f469b1479e02b9d07e77054a2db7bcab@cepejvghn9noue.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/ddtcrljun8vv5d",
+  {
+    pghost: "cepejvghn9noue.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com",
+    //hostname: "cepejvghn9noue.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com",
+    database: "ddtcrljun8vv5d",
+    user: "ublctmmglou7hi",
+    pgpassword:
+      "p31c8ddbd29c68038ec7f6280d007c005f469b1479e02b9d07e77054a2db7bcab",
+    pgport: 5432,
+    ssl: true,
+  }
 );
 await client.connect();
 
