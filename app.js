@@ -35,9 +35,9 @@ const port = 8080
         "Accept",
         "Origin",
         "User-Agent",
-        // "Access-Control-Allow-Origin",
-        // "Access-Control-Allow-Headers",
-        // "Access-Control-Allow-Credentials",
+        "Access-Control-Allow-Origin",
+        "Access-Control-Allow-Headers",
+        "Access-Control-Allow-Credentials",
       ],
       credentials: true,
     });
