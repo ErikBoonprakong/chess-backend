@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const shortid = require("shortid");
 
-const port = 8080
+const port = process.env.port || 8080
 
     const app = express();
     app.use(bodyParser.json());
